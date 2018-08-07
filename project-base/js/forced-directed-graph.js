@@ -139,6 +139,31 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
 
             });
 
+            var node1 = document.createElement("LI");
+
+            document.getElementById("myList").innerHTML = "PARTITIONS";
+
+/////partnerleri yazıyor liste halinde
+            graph.links.forEach(function(o){
+                if(o.source == d) {
+                    node1 = document.createElement("LI");
+                    node1.className = "list-group-item"
+                    var textnode = document.createTextNode(o.target.value);
+                    node1.appendChild(textnode);
+                    document.getElementById("myList").appendChild(node1);
+                }
+                if(o.target == d){
+                    node1 = document.createElement("LI");
+                    node1.className = "list-group-item"
+                    var textnode = document.createTextNode(o.source.value);
+                    node1.appendChild(textnode);
+                    document.getElementById("myList").appendChild(node1);
+                }
+                else{
+                    //document.getElementById("myList").appendChild(node1);
+                }
+            });
+
         };
     }
 
