@@ -121,6 +121,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
 
     function fade(opacity) {
         return function(d) {
+            $("ul").empty();
             node.style("stroke-opacity", function(o) {
 
                 let thisOpacity = isConnected(d, o) ? 1 : opacity;
@@ -130,15 +131,14 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                 return thisOpacity;
             });
 
-            ////////////////////buraya sayfanın yanında çıkacak şeyleri ekliyorum
             document.getElementById("isim").innerHTML = d.value;
             document.getElementById("country").innerHTML = d.country;
             document.getElementById("type").innerHTML = d.activity;
             document.getElementById("kac").innerHTML = d.kackez;
             document.getElementById("connections").innerHTML = d.baglanti;
-////////////////////
-            
-            console.log(graph.nodes[0].name);
+
+
+
             link.style("stroke-opacity", function(o) {
 
                 if(o.source === d || o.target === d)
@@ -150,50 +150,53 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
 
             var node1 = document.createElement("LI");
 
-            document.getElementById("myList").innerHTML = "PARTITIONS";
 
-/////partnerleri yazıyor liste halinde
+
+            // show the partner list of the clicked node
             graph.links.forEach(function(o){
                 if(o.source == d) {
                     node1 = document.createElement("LI");
                     node1.className = "list-group-item";
-////span ekledim. listenin içindeki elemana span elementi ekliyor. aynısını button şeklinde yapabilirsin.
-                    span = document.createElement("span");
+                    var span = document.createElement("span");
                     span.className = "badge";
-                    span.style="color:orange";
-
+                    span.style= "color:orange";
                     var textnode1 = document.createTextNode(o.target.value);
                     var textnode2 = document.createTextNode(o.weight/2);
-
                     span.appendChild(textnode2);
-
                     node1.appendChild(textnode1);
-                    node1.appendChild(span);
 
+                    createButton(node1, o.target.value, function(){
+                        console.log("button" + this);
+                        searchNode(o.target.value);
+                    });
+                    node1.appendChild(span);
                     document.getElementById("myList").appendChild(node1);
+
+
                 }
-                if(o.target == d){
+                else if(o.target == d){
                     node1 = document.createElement("LI");
-                    node1.className = "list-group-item"
-
-                    span = document.createElement("span");
+                    node1.className = "list-group-item";
+                    var span = document.createElement("span");
                     span.className = "badge";
-                    span.style="color: orange";
-
+                    span.style= "color:orange";
                     var textnode1 = document.createTextNode(o.source.value);
-                    var textnode2 = document.createTextNode(o.weight/2 );
-
+                    var textnode2 = document.createTextNode(o.weight/2);
                     span.appendChild(textnode2);
-
                     node1.appendChild(textnode1);
-                    node1.appendChild(span);
 
+                    createButton(node1, o.source.value, function(){
+                        console.log("button" + this);
+                        searchNode(o.source.value);
+                    });
+                    node1.appendChild(span);
                     document.getElementById("myList").appendChild(node1);
+
                 }
                 else{
-                    //document.getElementById("myList").appendChild(node1);
                 }
             });
+
 
             ////sorting the list according to number of the list element.
             //// **begin with biggest**
@@ -218,14 +221,24 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                 if (shouldSwitch) {
                     /*If a switch has been marked, make the switch
                     and mark the switch as done:*/
-                    b[i].parentNode.insertBefore(b[i + 1], b[i]);
+                    b[0].parentNode.insertBefore(b[i + 1], b[i]);
                     switching = true;
                 }
             }
-                    
 
         };
     }
+    function createButton(context,value, func){
+        var button = document.createElement("button");
+        var span = document.createElement("span");
+        span.className = "glyphicon glyphicon-arrow-right";
+        button.type = "button";
+        button.className = "btn btn-xs btn-default";
+        button.appendChild(span);
+        button.onclick = func;
+        context.appendChild(button);
+    }
+
 
     function searchNode(name){
 
@@ -233,7 +246,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             graph.nodes.forEach(function (d) {
                 // noinspection JSAnnotator
                 if (d.value === name) {
-
+                    d3v4.selectAll('circle').dispatch('mouseleave');
                     d3v4.select('circle[data="'+ d.data +'"]')
                         .dispatch('mouseover')
                         .dispatch('click');
@@ -249,7 +262,6 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
 
     node.on("click", fade(.1)).on("unclick", fade(1));
 
-    //document.getElementById("searchButton").addEventListener('click', searchNode);
 
 
     var simulation = d3v4.forceSimulation()
@@ -310,6 +322,12 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             if(d.selected) {
                 d3v4.select('circle[data="' + d.data + '"]').dispatch('unclick');
             }
+            $("ul").empty();
+            document.getElementById("isim").innerHTML = "NAME";
+            document.getElementById("country").innerHTML = "COUNTRY";
+            document.getElementById("type").innerHTML = "ACTIVITY TYPE";
+            document.getElementById("kac").innerHTML = "# PROJECTS";
+            document.getElementById("connections").innerHTML = "# CONNECTIONS";
             d.selected = false;
             d.previouslySelected = false;
         });
@@ -454,6 +472,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
 
 
     });
+
 
     return graph;
 }
