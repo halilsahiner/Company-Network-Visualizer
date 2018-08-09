@@ -156,40 +156,53 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             graph.links.forEach(function(o){
                 if(o.source == d) {
                     node1 = document.createElement("LI");
-                    node1.className = "list-group-item";
+                    node1.className = "list-group-item d-flex justify-content-between align-items-center";
                     var span = document.createElement("span");
-                    span.className = "badge";
-                    span.style= "color:orange";
+                    span.className = "badge badge-pill badge-info";
+                    span.style= "font-size: 10px;";
                     var textnode1 = document.createTextNode(o.target.value);
                     var textnode2 = document.createTextNode(o.weight/2);
                     span.appendChild(textnode2);
-                    node1.appendChild(textnode1);
+                    
+                    var p = document.createElement("p");
+                    p.style = " margin-bottom: 0px; padding-right: 50px";
+                    p.appendChild(textnode1);
+                    node1.appendChild(p);
+                    
 
                     createButton(node1, o.target.value, function(){
                         console.log("button" + this);
                         searchNode(o.target.value);
                     });
                     node1.appendChild(span);
+                    
                     document.getElementById("myList").appendChild(node1);
 
 
                 }
                 else if(o.target == d){
                     node1 = document.createElement("LI");
-                    node1.className = "list-group-item";
+                    node1.className = "list-group-item d-flex justify-content-between align-items-center";
                     var span = document.createElement("span");
-                    span.className = "badge";
-                    span.style= "color:orange";
+                    span.className = "badge badge-pill badge-info";
+                    span.style= "font-size: 10px;";
                     var textnode1 = document.createTextNode(o.source.value);
                     var textnode2 = document.createTextNode(o.weight/2);
                     span.appendChild(textnode2);
-                    node1.appendChild(textnode1);
+                    
+
+                    var p = document.createElement("p");
+                    p.style = " margin-bottom: 0px; padding-right: 50px";
+                    p.appendChild(textnode1);
+                    node1.appendChild(p);
+                    
 
                     createButton(node1, o.source.value, function(){
                         console.log("button" + this);
                         searchNode(o.source.value);
                     });
                     node1.appendChild(span);
+                    
                     document.getElementById("myList").appendChild(node1);
 
                 }
@@ -233,7 +246,8 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
         var span = document.createElement("span");
         span.className = "glyphicon glyphicon-arrow-right";
         button.type = "button";
-        button.className = "btn btn-xs btn-default";
+        button.className = "btn btn-xs btn-info";
+        button.style = "margin-right: 0px; margin-left:auto";
         button.appendChild(span);
         button.onclick = func;
         context.appendChild(button);
