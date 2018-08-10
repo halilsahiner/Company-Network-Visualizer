@@ -12,6 +12,11 @@
 
 <div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin-right: 250px; margin-top: 30px; margin-left: 350px; float: middle; margin-bottom: 12px; position: absolute;" >
     <svg></svg>
+<div align='center' id="FilterButtons" style="vertical-align: bottom; margin: auto;">
+        <input type="number" min="0" max="1" id="num"/>
+        <button onclick="filteringGraph()" id= "graphFilter" class="btn btn-primary btn-success"><span class="glyphicon glyphicon-filter"></span></button>
+
+    </div>
 </div>
 
 <div id="content" style="bottom: 0px; position: absolute;">
@@ -72,15 +77,69 @@
 <script type="text/javascript" src="js/jquery.autocomplete.min.js"></script>
 
 <script>
-    var svg = d3.select('#d3_selectable_force_directed_graph');
+    var max = document.getElementById("num").max * 2;
+    var filterWeight = 4;
+    var isFirstTime = true;
+    var filteredNodes = [];
+    var nodesToFilter;
+   
+    function filteringGraph() {
 
-    d3.json('json/database_biggest.json', function(error, graph) {
-        if (!error) {
-            //console.log('graph', graph);
-            
-            createV4SelectableForceDirectedGraph(svg, graph);
-        } else {
-            console.error(error);
-        }
-    });
+         var svg = d3.select('#d3_selectable_force_directed_graph');
+
+        if(isFirstTime !== true)
+            filterWeight = document.getElementById("num").value * 2;
+        console.log(filterWeight);
+        d3.json('json/database_biggest.json', function(error, graph) {
+            graph.nodes.sort(function (a,b) {
+               return a.data - b.data;
+            });
+            //console.log(graph.nodes);
+            if (!error) {
+
+                if(filterWeight !== 0)
+                    nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {});
+
+                graph.links = graph.links.filter(function (a) {
+                    if(isFirstTime !== false) {
+                        if (max < a.weight)
+                            max = a.weight;
+                    }
+
+                    if(filterWeight !== 0 && a.weight >= filterWeight)
+                    {
+                        nodesToFilter[a.source-1] = 1;
+                        nodesToFilter[a.target-1] = 1;
+                    }
+                    return a.weight >= filterWeight;
+
+                });
+                //console.log(nodesToFilter);
+
+                if( filterWeight !== 0) {
+                    filteredNodes = [];
+
+                    for (var k = 0; k < graph.nodes.length; k++) {
+                        if (nodesToFilter[k] === 1)
+                            filteredNodes.push(graph.nodes[k]);
+
+                    }
+                    //console.log(filteredNodes);
+
+                    graph.nodes = filteredNodes;
+                }
+
+                createV4SelectableForceDirectedGraph(svg, graph);
+
+                if(isFirstTime) {
+                    document.getElementById("num").max = max / 2;
+                    isFirstTime = false;
+                }
+
+            } else {
+                console.error(error);
+            }
+        });
+    }
+    filteringGraph();
 </script> 
