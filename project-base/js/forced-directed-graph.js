@@ -65,12 +65,12 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
         .enter().append("line")
         .attr("stroke", function(d) {
         	if (d.weight == 2 )
-        		return " red";
-        	if (d.weight == 3)
+        		return " grey";
+        	if (d.weight == 4)
         		return "yellow";
-        	if (d.weight == 4 )
+        	if (d.weight == 6 )
         		return "purple";
-        	if (d.weight > 4 )
+        	if (d.weight > 6 )
         		return "green";  });
 
     var node = gDraw.append("g")
@@ -136,18 +136,70 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             document.getElementById("type").innerHTML = d.activity;
             document.getElementById("kac").innerHTML = d.kackez;
             document.getElementById("connections").innerHTML = d.baglanti;
-
-
+            
+            //show the partner list of the clicked node and adjust link opacity clicking node
+            var node1 = document.createElement("LI");
 
             link.style("stroke-opacity", function(o) {
 
-                if(o.source === d || o.target === d)
+                if(o.source === d){
+                    node1 = document.createElement("LI");
+                    node1.className = "list-group-item d-flex justify-content-between align-items-center";
+                    var span = document.createElement("span");
+                    span.className = "badge badge-pill badge-info";
+                    span.style= "font-size: 10px;";
+                    var textnode1 = document.createTextNode(o.target.value);
+                    var textnode2 = document.createTextNode(o.weight/2);
+                    span.appendChild(textnode2);
+                    
+                    var p = document.createElement("p");
+                    p.style = " margin-bottom: 0px; padding-right: 50px";
+                    p.appendChild(textnode1);
+                    node1.appendChild(p);
+                    
+
+                    createButton(node1, o.target.value, function(){
+                        console.log("button" + this);
+                        searchNode(o.target.value);
+                    });
+                    node1.appendChild(span);
+                    
+                    document.getElementById("myList").appendChild(node1);
+
                 	return 1;
+                }
+                if(o.target === d){
+                    node1 = document.createElement("LI");
+                    node1.className = "list-group-item d-flex justify-content-between align-items-center";
+                    var span = document.createElement("span");
+                    span.className = "badge badge-pill badge-info";
+                    span.style= "font-size: 10px;";
+                    var textnode1 = document.createTextNode(o.source.value);
+                    var textnode2 = document.createTextNode(o.weight/2);
+                    span.appendChild(textnode2);
+                    
+
+                    var p = document.createElement("p");
+                    p.style = " margin-bottom: 0px; padding-right: 50px";
+                    p.appendChild(textnode1);
+                    node1.appendChild(p);
+                    
+
+                    createButton(node1, o.source.value, function(){
+                        console.log("button" + this);
+                        searchNode(o.source.value);
+                    });
+                    node1.appendChild(span);
+                    
+                    document.getElementById("myList").appendChild(node1);
+
+                    return 1;
+                }
                 else
                 	return opacity;
 
             });
-
+/*
             var node1 = document.createElement("LI");
 
 
@@ -209,7 +261,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                 else{
                 }
             });
-
+*/
 
             ////sorting the list according to number of the list element.
             //// **begin with biggest**

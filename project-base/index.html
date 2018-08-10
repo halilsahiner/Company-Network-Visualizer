@@ -10,12 +10,12 @@
 
 <body>
 
-<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin: auto; margin-bottom: 12px " >
+<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin-right: 250px; margin-top: 30px; margin-left: 350px; float: middle; margin-bottom: 12px; position: absolute;" >
     <svg></svg>
 </div>
 
-<div id="content">
-    <div id="searchfield">
+<div id="content" style="bottom: 0px; position: absolute;">
+    <div id="searchfield" >
         <form>
             <input  type="text" name="currency" class="biginput" id="autocomplete" value="">
 
@@ -23,9 +23,16 @@
     </div><!-- @end #searchfield -->
 </div><!-- @end #content -->
 
-<div  class="left" align="left" style="vertical-align: top;  margin-left: 10px; margin-top: 10px">
-    <div  class="right" align="right" style="vertical-align: top; float: right; margin-top: 10px; width: 200px">
-        <table class="table table-dark table-striped">
+<div  class="left" align="left" style="vertical-align: top; float: left; margin-top: 30px; width: 350px; margin-left: 10px">
+    
+    <h2>PARTNERS</h2>
+    <ul id="myList" style="margin-right: 50px; width: 350px; overflow: scroll; -webkit-overflow-scrolling: touch; max-height: 480px; padding-left: 0px ">
+
+    </ul>
+</div>
+
+<div  class="right" align="right" style="vertical-align: top; float: right; margin-top: 10px; width: 200px; text-align: center; margin-top: 30px; margin-right: 10px">
+    <table class="table table-dark table-striped">
             <thead>
             <th> INFO </th>
             </thead>
@@ -45,11 +52,6 @@
                 <td id ="connections">  # CONNECTIONS </td>
             </tr>
         </table>
-    </div>
-    <h2>PARTNERS</h2>
-    <ul id="myList" style="margin-right: 800px; width: 500px;">
-
-    </ul>
 </div>
 
 
@@ -72,9 +74,10 @@
 <script>
     var svg = d3.select('#d3_selectable_force_directed_graph');
 
-    d3.json('json/database_big.json', function(error, graph) {
+    d3.json('json/database_biggest.json', function(error, graph) {
         if (!error) {
             //console.log('graph', graph);
+            
             createV4SelectableForceDirectedGraph(svg, graph);
         } else {
             console.error(error);
