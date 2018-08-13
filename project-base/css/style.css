@@ -44,24 +44,6 @@ table { border-collapse: collapse; border-spacing: 0; }
 img { border: 0; max-width: 100%; }
 
 
-#topbar {
-  background: #4f4a41;
-  padding: 10px 0 10px 0;
-  text-align: center;
-}
-
-#topbar a {
-  color: #fff;
-  font-size:1.3em;
-  line-height: 1.25em;
-  text-decoration: none;
-  opacity: 0.5;
-  font-weight: bold;
-}
-
-#topbar a:hover {
-  opacity: 1;
-}
 
 /** typography **/
 h1 {
@@ -154,7 +136,7 @@ a:hover { text-decoration: underline; }
   transition: all 0.2s linear;
 }
 #searchfield form .biginput:focus {
-  color: #858585;
+  color: #5c5c5c;
 }
 
 #myList button {
@@ -163,11 +145,18 @@ a:hover { text-decoration: underline; }
   float: right;
 }
 
+::placeholder {
+  color: #5c5c5c;
+  opacity: 1; /* Firefox */
+}
 
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #5c5c5c;
+}
 
-
-
-
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #5c5c5c;
+}
 
 .autocomplete-suggestions { border: 1px solid #999; background: #fff; cursor: default; overflow: auto; }
 .autocomplete-suggestion { padding: 10px 5px; font-size: 1.2em; white-space: nowrap; overflow: hidden; }

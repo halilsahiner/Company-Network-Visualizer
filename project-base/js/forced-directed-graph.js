@@ -522,7 +522,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
 
 
         // setup autocomplete function pulling from currencies[] array
-        $('#autocomplete').autocomplete({
+        $('#autocompleteCompanies').autocomplete({
             lookup: graph.nodes,
             onSelect: function (suggestion) {
 
@@ -536,9 +536,21 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             }
         });
 
+        $('#autocompleteProjects').autocomplete({
+
+            lookup: graph.projects,
+            onSelect: function (suggestion) {
+               // console.log(graph.nodes[suggestion.pro_nodes[0]].value);
+                console.log(suggestion.pro_nodes);
+                //searchNode(graph.nodes[suggestion.pro_nodes[0]].value);
+                projectFiltering(suggestion.pro_nodes);
+            }
+
+        });
+
+
 
     });
-
 
     return graph;
 }

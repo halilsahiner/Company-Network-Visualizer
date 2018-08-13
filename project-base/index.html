@@ -19,30 +19,14 @@
         <button onclick="filteringGraph(2)" id= "graphDegreeFilter" class="btn btn-primary btn-danger"><span class="glyphicon glyphicon-filter"></span></button>
         <button onclick="filteringGraph(3)" id= "graphWeightAndDegreeFilter" class="btn btn-primary btn-info"><span class="glyphicon glyphicon-filter"></span></button>
 
-        <!--Dropdown primary-->
-        <div class="dropdown">
-
-            <!--Trigger-->
-            <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter by Countries</button>
-
-
-            <!--Menu-->
-            <div class="dropdown-menu dropdown-primary" id="countryMenu">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-        </div>
-        <!--/Dropdown primary-->
     </div>
 </div>
 
 <div id="content" style="bottom: 0px; position: absolute;">
     <div id="searchfield" >
         <form>
-            <input  type="text" name="currency" class="biginput" id="autocomplete" value="">
-
+            <input  placeholder="Search for companies" type="text" name="currency" class="biginput" id="autocompleteCompanies" value="">
+            <input  placeholder="Search for projects" type="text" name="currency" class="biginput" id="autocompleteProjects" value="">
         </form>
     </div><!-- @end #searchfield -->
 </div><!-- @end #content -->
@@ -133,46 +117,43 @@
                 {
                     filterWeight = 0;
                 }
-                graph.links = graph.links.filter(function (a) {
-                    if(isFirstTime ) {
-                        if (maxWeight < a.weight)
-                            maxWeight = a.weight;
-                    }
-                   /* if (filterDegree <= graph.nodes[a.source - 1].baglanti || filterDegree <= graph.nodes[a.target- 1].baglanti) {
-
-                        if ( a.weight >= filterWeight) {
-                            nodesToFilter[a.source - 1] = 1;
-                            nodesToFilter[a.target - 1] = 1;
+                if( isFirstTime || ( filterWeight || filterDegree) ) {
+                    graph.links = graph.links.filter(function (a) {
+                        if (isFirstTime) {
+                            if (maxWeight < a.weight)
+                                maxWeight = a.weight;
+                            return true;
                         }
-                        return a.weight >= filterWeight;
-                    }
-                    return false;*/
-                    if (a.weight >= filterWeight) {
-                           if (filterDegree <= graph.nodes[a.source - 1].baglanti) {
-                               nodesToFilter[a.source - 1] = 1;
-                           }
-                           if (filterDegree <= graph.nodes[a.target - 1].baglanti) {
-                               nodesToFilter[a.target - 1] = 1;
-                           }
-                    }
-                    if (filterDegree <= graph.nodes[a.source - 1].baglanti && filterDegree <= graph.nodes[a.target - 1].baglanti)
-                        return a.weight >= filterWeight;
-                    return false;
+                        else {
 
-                });
-
-                    filteredNodes = [];
-                    for (var k = 0; k < graph.nodes.length; k++) {
-
-                        if (nodesToFilter[k] === 1) {
-                            filteredNodes.push(graph.nodes[k]);
-                            if (maxDegree < graph.nodes[k].baglanti)
-                                maxDegree = graph.nodes[k].baglanti;
+                            if (a.weight >= filterWeight) {
+                                if (filterDegree <= graph.nodes[a.source - 1].baglanti) {
+                                    nodesToFilter[a.source - 1] = 1;
+                                }
+                                if (filterDegree <= graph.nodes[a.target - 1].baglanti) {
+                                    nodesToFilter[a.target - 1] = 1;
+                                }
+                            }
+                            if (filterDegree <= graph.nodes[a.source - 1].baglanti && filterDegree <= graph.nodes[a.target - 1].baglanti)
+                                return a.weight >= filterWeight;
+                            return false;
                         }
+
+                    });
+                    if( !isFirstTime) {
+                        filteredNodes = [];
+                        for (var k = 0; k < graph.nodes.length; k++) {
+
+                            if (nodesToFilter[k] === 1) {
+                                filteredNodes.push(graph.nodes[k]);
+                                if (maxDegree < graph.nodes[k].baglanti)
+                                    maxDegree = graph.nodes[k].baglanti;
+                            }
+                        }
+
+                        graph.nodes = filteredNodes;
                     }
-
-                    graph.nodes = filteredNodes;
-
+                }
 
                 createV4SelectableForceDirectedGraph(svg, graph);
 
@@ -189,5 +170,44 @@
             }
         });
     }
-    filteringGraph();
+    function projectFiltering( projectArray){
+        var svg = d3.select('#d3_selectable_force_directed_graph');
+        d3.json('json/with_project.json', function(error, graph) {
+            nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {});
+            if(!error){
+                if(projectArray.length !== 1) {
+                    graph.links = graph.links.filter(function (a) {
+                        if (projectArray.indexOf(a.source) > -1 || projectArray.indexOf(a.target) > -1) {
+                            nodesToFilter[a.source - 1] = 1;
+                            nodesToFilter[a.target - 1] = 1;
+                        }
+                        if (projectArray.indexOf(a.source) > -1 && projectArray.indexOf(a.target) > -1)
+                            return true;
+                        return false;
+                    });
+
+                    filteredNodes = [];
+                    for (var k = 0; k < graph.nodes.length; k++) {
+
+                        if (nodesToFilter[k] === 1) {
+                            filteredNodes.push(graph.nodes[k]);
+                            if (maxDegree < graph.nodes[k].baglanti)
+                                maxDegree = graph.nodes[k].baglanti;
+                        }
+                    }
+                } else {
+                    graph.links = [];
+                    filteredNodes = [];
+                    filteredNodes.push(graph.nodes[projectArray[0]]);
+                }
+                graph.nodes = filteredNodes;
+
+                createV4SelectableForceDirectedGraph(svg, graph);
+            } else {
+                console.log(error);
+            }
+        });
+    }
+
+    filteringGraph(3);
 </script> 
