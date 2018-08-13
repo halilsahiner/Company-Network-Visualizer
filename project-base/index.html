@@ -10,23 +10,97 @@
 
 <body>
 
-<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin-right: 250px; margin-top: 30px; margin-left: 350px;  margin-bottom: 12px;  position: absolute;" >
+<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin-right: 250px; margin-top: 30px; margin-left: 350px; float: middle; margin-bottom: 12px; position: absolute;" >
     <svg></svg>
-    <div align='center' id="FilterButtons" style="vertical-align: bottom; margin: auto;">
-        <input type="number" min="0" max="1" id="chosenWeight"/>
-        <button onclick="filteringGraph(1)" id= "graphWeight" class="btn btn-primary btn-success"><span class="glyphicon glyphicon-filter"></span></button>
-        <input type="number" min="0" max="1" id="chosenDegree"/>
-        <button onclick="filteringGraph(2)" id= "graphDegreeFilter" class="btn btn-primary btn-danger"><span class="glyphicon glyphicon-filter"></span></button>
-        <button onclick="filteringGraph(3)" id= "graphWeightAndDegreeFilter" class="btn btn-primary btn-info"><span class="glyphicon glyphicon-filter"></span></button>
 
-    </div>
 </div>
 
+
+
+
+
 <div id="content" style="bottom: 0px; position: absolute;">
-    <div id="searchfield" >
+
+<div class="row"  align='center' style="bottom: 135px; margin-left: 370px; position: absolute;  ">
+
+<div class="dropdown">
+    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+    Şirket/Proje İçin Seç
+    </button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" data-target="#form-check, #form-check2, #form-check3, #form-check4, #searchfield, #graphFilter" data-toggle="collapse" > Şirket için seç </a>
+      <a class="dropdown-item" data-target="#form-check, #form-check2, #form-check3, #form-check4, #searchfield, #graphFilter" data-toggle="collapse" > Proje için seç </a>
+    </div>
+</div>
+<div id="form-check" class="collapse" style="margin-left: 10px">
+    <label>        
+        <input type="checkbox" name="check" class="weight-filter" > 
+        <span >
+        Bağlantı sayısı
+        <div id="FilterButtons" >
+            <input type="number" min="0" max="1" id="num"/>
+            
+        </div>
+        
+        </span>
+    </label>
+                
+</div>
+<div id="form-check2" class="collapse" style="margin-left: 10px">
+    <label>        
+        <input type="checkbox" name="check" class="projectno-filter" > 
+        <span >
+        Şirketin proje sayısı
+        <div id="FilterButtons" >
+            <input type="number" min="0" max="1" id="num"/>
+            
+        </div>
+        
+        </span>
+    </label>
+                
+</div>
+
+<div id="form-check3" class="collapse" style="margin-left: 10px">
+    <label>        
+        <input type="checkbox" name="check" class="cost-filter" > 
+        <span >
+        Total cost için seç
+        <div id="FilterButtons" >
+            <input type="number" min="0" max="1" id="num"/>
+           
+        </div>
+        
+        </span>
+    </label>
+                
+</div>
+
+<div id="form-check4" class="collapse" style="margin-left: 10px; ">
+    <label>        
+        <input type="checkbox" name="check" class="call-filter" > 
+        <span >
+        Call kod için seç
+        <div id="FilterButtons" >
+            <input type="number" min="0" max="1" id="num"/>
+            
+        </div>
+        
+        </span>
+    </label>
+
+
+
+</div>
+
+<button onclick="filteringGraph()" id= "graphFilter" class="btn btn-primary btn-success, collapse" style="margin-left:10px" ><span class="glyphicon glyphicon-filter"></span></button>
+
+
+</div>
+    <div id="searchfield" class="collapse" >
         <form>
-            <input  placeholder="Search for companies" type="text" name="currency" class="biginput" id="autocompleteCompanies" value="">
-            <input  placeholder="Search for projects" type="text" name="currency" class="biginput" id="autocompleteProjects" value="">
+            <input  type="text" name="currency" class="biginput" id="autocomplete" value="">
+
         </form>
     </div><!-- @end #searchfield -->
 </div><!-- @end #content -->
@@ -37,6 +111,8 @@
     <ul id="myList" style="margin-right: 50px; width: 350px; overflow: scroll; -webkit-overflow-scrolling: touch; max-height: 480px; padding-left: 0px ">
 
     </ul>
+
+
 </div>
 
 <div  class="right" align="right" style="vertical-align: top; float: right; margin-top: 10px; width: 200px; text-align: center; margin-top: 30px; margin-right: 10px">
@@ -80,134 +156,69 @@
 <script type="text/javascript" src="js/jquery.autocomplete.min.js"></script>
 
 <script>
-    var maxWeight = document.getElementById("chosenWeight").max * 2;
-    var maxDegree = document.getElementById("chosenDegree").max;
-    var filterDegree = 0;
+    var max = document.getElementById("num").max * 2;
     var filterWeight = 4;
     var isFirstTime = true;
     var filteredNodes = [];
     var nodesToFilter;
+   
+    function filteringGraph() {
+        console.log(document.querySelector('.weight-filter').checked);
+         var svg = d3.select('#d3_selectable_force_directed_graph');
 
-    /**
-     *
-     * @param type 1 = filter by only weight, 2 = filter by only degree, 3 = filter by degree and weight
-     */
-
-    function filteringGraph(type) {
-
-        var svg = d3.select('#d3_selectable_force_directed_graph');
-
-        if(isFirstTime !== true){
-            filterWeight = document.getElementById("chosenWeight").value * 2;
-            filterDegree = document.getElementById("chosenDegree").value;
-        }
-
-
-        d3.json('json/with_project.json', function(error, graph) {
-
+        if(isFirstTime !== true)
+            filterWeight = document.getElementById("num").value * 2;
+        console.log(filterWeight);
+        d3.json('json/database_biggest.json', function(error, graph) {
+            graph.nodes.sort(function (a,b) {
+               return a.data - b.data;
+            });
+            //console.log(graph.nodes);
             if (!error) {
 
-                nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {});
+                if(filterWeight !== 0)
+                    nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {});
 
-                if(type === 1)
-                {
-                    filterDegree = 0;
-                }
-                else if(type === 2)
-                {
-                    filterWeight = 0;
-                }
-                if( isFirstTime || ( filterWeight || filterDegree) ) {
-                    graph.links = graph.links.filter(function (a) {
-                        if (isFirstTime) {
-                            if (maxWeight < a.weight)
-                                maxWeight = a.weight;
-                            return true;
-                        }
-                        else {
-
-                            if (a.weight >= filterWeight) {
-                                if (filterDegree <= graph.nodes[a.source - 1].baglanti) {
-                                    nodesToFilter[a.source - 1] = 1;
-                                }
-                                if (filterDegree <= graph.nodes[a.target - 1].baglanti) {
-                                    nodesToFilter[a.target - 1] = 1;
-                                }
-                            }
-                            if (filterDegree <= graph.nodes[a.source - 1].baglanti && filterDegree <= graph.nodes[a.target - 1].baglanti)
-                                return a.weight >= filterWeight;
-                            return false;
-                        }
-
-                    });
-                    if( !isFirstTime) {
-                        filteredNodes = [];
-                        for (var k = 0; k < graph.nodes.length; k++) {
-
-                            if (nodesToFilter[k] === 1) {
-                                filteredNodes.push(graph.nodes[k]);
-                                if (maxDegree < graph.nodes[k].baglanti)
-                                    maxDegree = graph.nodes[k].baglanti;
-                            }
-                        }
-
-                        graph.nodes = filteredNodes;
+                graph.links = graph.links.filter(function (a) {
+                    if(isFirstTime !== false) {
+                        if (max < a.weight)
+                            max = a.weight;
                     }
+
+                    if(filterWeight !== 0 && a.weight >= filterWeight)
+                    {
+                        nodesToFilter[a.source-1] = 1;
+                        nodesToFilter[a.target-1] = 1;
+                    }
+                    return a.weight >= filterWeight;
+
+                });
+                //console.log(nodesToFilter);
+
+                if( filterWeight !== 0) {
+                    filteredNodes = [];
+
+                    for (var k = 0; k < graph.nodes.length; k++) {
+                        if (nodesToFilter[k] === 1)
+                            filteredNodes.push(graph.nodes[k]);
+
+                    }
+                    //console.log(filteredNodes);
+
+                    graph.nodes = filteredNodes;
                 }
 
                 createV4SelectableForceDirectedGraph(svg, graph);
 
                 if(isFirstTime) {
-                    document.getElementById("chosenWeight").max= maxWeight/ 2;
-                   // document.getElementById("chosenDegree").max= maxDegree;
+                    document.getElementById("num").max = max / 2;
                     isFirstTime = false;
                 }
-                document.getElementById("chosenDegree").max= maxDegree;
-                console.log(maxDegree);
-                maxDegree = 1;
+
             } else {
                 console.error(error);
             }
         });
     }
-    function projectFiltering( projectArray){
-        var svg = d3.select('#d3_selectable_force_directed_graph');
-        d3.json('json/with_project.json', function(error, graph) {
-            nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {});
-            if(!error){
-                if(projectArray.length !== 1) {
-                    graph.links = graph.links.filter(function (a) {
-                        if (projectArray.indexOf(a.source) > -1 || projectArray.indexOf(a.target) > -1) {
-                            nodesToFilter[a.source - 1] = 1;
-                            nodesToFilter[a.target - 1] = 1;
-                        }
-                        if (projectArray.indexOf(a.source) > -1 && projectArray.indexOf(a.target) > -1)
-                            return true;
-                        return false;
-                    });
-
-                    filteredNodes = [];
-                    for (var k = 0; k < graph.nodes.length; k++) {
-
-                        if (nodesToFilter[k] === 1) {
-                            filteredNodes.push(graph.nodes[k]);
-                            if (maxDegree < graph.nodes[k].baglanti)
-                                maxDegree = graph.nodes[k].baglanti;
-                        }
-                    }
-                } else {
-                    graph.links = [];
-                    filteredNodes = [];
-                    filteredNodes.push(graph.nodes[projectArray[0]]);
-                }
-                graph.nodes = filteredNodes;
-
-                createV4SelectableForceDirectedGraph(svg, graph);
-            } else {
-                console.log(error);
-            }
-        });
-    }
-
-    filteringGraph(3);
+    filteringGraph();
 </script> 
