@@ -153,7 +153,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     span.appendChild(textnode2);
                     
                     var p = document.createElement("p");
-                    p.style = " margin-bottom: 0px; padding-right: 50px";
+                    p.style = "margin-bottom: 0px; padding-right: 50px";
                     p.appendChild(textnode1);
                     node1.appendChild(p);
                     

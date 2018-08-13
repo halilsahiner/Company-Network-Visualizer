@@ -10,12 +10,31 @@
 
 <body>
 
-<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin-right: 250px; margin-top: 30px; margin-left: 350px; float: middle; margin-bottom: 12px; position: absolute;" >
+<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin-right: 250px; margin-top: 30px; margin-left: 350px;  margin-bottom: 12px;  position: absolute;" >
     <svg></svg>
-<div align='center' id="FilterButtons" style="vertical-align: bottom; margin: auto;">
-        <input type="number" min="0" max="1" id="num"/>
-        <button onclick="filteringGraph()" id= "graphFilter" class="btn btn-primary btn-success"><span class="glyphicon glyphicon-filter"></span></button>
+    <div align='center' id="FilterButtons" style="vertical-align: bottom; margin: auto;">
+        <input type="number" min="0" max="1" id="chosenWeight"/>
+        <button onclick="filteringGraph(1)" id= "graphWeight" class="btn btn-primary btn-success"><span class="glyphicon glyphicon-filter"></span></button>
+        <input type="number" min="0" max="1" id="chosenDegree"/>
+        <button onclick="filteringGraph(2)" id= "graphDegreeFilter" class="btn btn-primary btn-danger"><span class="glyphicon glyphicon-filter"></span></button>
+        <button onclick="filteringGraph(3)" id= "graphWeightAndDegreeFilter" class="btn btn-primary btn-info"><span class="glyphicon glyphicon-filter"></span></button>
 
+        <!--Dropdown primary-->
+        <div class="dropdown">
+
+            <!--Trigger-->
+            <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter by Countries</button>
+
+
+            <!--Menu-->
+            <div class="dropdown-menu dropdown-primary" id="countryMenu">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+        </div>
+        <!--/Dropdown primary-->
     </div>
 </div>
 
@@ -77,65 +96,94 @@
 <script type="text/javascript" src="js/jquery.autocomplete.min.js"></script>
 
 <script>
-    var max = document.getElementById("num").max * 2;
+    var maxWeight = document.getElementById("chosenWeight").max * 2;
+    var maxDegree = document.getElementById("chosenDegree").max;
+    var filterDegree = 0;
     var filterWeight = 4;
     var isFirstTime = true;
     var filteredNodes = [];
     var nodesToFilter;
-   
-    function filteringGraph() {
 
-         var svg = d3.select('#d3_selectable_force_directed_graph');
+    /**
+     *
+     * @param type 1 = filter by only weight, 2 = filter by only degree, 3 = filter by degree and weight
+     */
 
-        if(isFirstTime !== true)
-            filterWeight = document.getElementById("num").value * 2;
-        console.log(filterWeight);
-        d3.json('json/database_biggest.json', function(error, graph) {
-            graph.nodes.sort(function (a,b) {
-               return a.data - b.data;
-            });
-            //console.log(graph.nodes);
+    function filteringGraph(type) {
+
+        var svg = d3.select('#d3_selectable_force_directed_graph');
+
+        if(isFirstTime !== true){
+            filterWeight = document.getElementById("chosenWeight").value * 2;
+            filterDegree = document.getElementById("chosenDegree").value;
+        }
+
+
+        d3.json('json/with_project.json', function(error, graph) {
+
             if (!error) {
 
-                if(filterWeight !== 0)
-                    nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {});
+                nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {});
 
+                if(type === 1)
+                {
+                    filterDegree = 0;
+                }
+                else if(type === 2)
+                {
+                    filterWeight = 0;
+                }
                 graph.links = graph.links.filter(function (a) {
-                    if(isFirstTime !== false) {
-                        if (max < a.weight)
-                            max = a.weight;
+                    if(isFirstTime ) {
+                        if (maxWeight < a.weight)
+                            maxWeight = a.weight;
                     }
+                   /* if (filterDegree <= graph.nodes[a.source - 1].baglanti || filterDegree <= graph.nodes[a.target- 1].baglanti) {
 
-                    if(filterWeight !== 0 && a.weight >= filterWeight)
-                    {
-                        nodesToFilter[a.source-1] = 1;
-                        nodesToFilter[a.target-1] = 1;
+                        if ( a.weight >= filterWeight) {
+                            nodesToFilter[a.source - 1] = 1;
+                            nodesToFilter[a.target - 1] = 1;
+                        }
+                        return a.weight >= filterWeight;
                     }
-                    return a.weight >= filterWeight;
+                    return false;*/
+                    if (a.weight >= filterWeight) {
+                           if (filterDegree <= graph.nodes[a.source - 1].baglanti) {
+                               nodesToFilter[a.source - 1] = 1;
+                           }
+                           if (filterDegree <= graph.nodes[a.target - 1].baglanti) {
+                               nodesToFilter[a.target - 1] = 1;
+                           }
+                    }
+                    if (filterDegree <= graph.nodes[a.source - 1].baglanti && filterDegree <= graph.nodes[a.target - 1].baglanti)
+                        return a.weight >= filterWeight;
+                    return false;
 
                 });
-                //console.log(nodesToFilter);
 
-                if( filterWeight !== 0) {
                     filteredNodes = [];
-
                     for (var k = 0; k < graph.nodes.length; k++) {
-                        if (nodesToFilter[k] === 1)
-                            filteredNodes.push(graph.nodes[k]);
 
+                        if (nodesToFilter[k] === 1) {
+                            filteredNodes.push(graph.nodes[k]);
+                            if (maxDegree < graph.nodes[k].baglanti)
+                                maxDegree = graph.nodes[k].baglanti;
+                        }
                     }
-                    //console.log(filteredNodes);
 
                     graph.nodes = filteredNodes;
-                }
+
 
                 createV4SelectableForceDirectedGraph(svg, graph);
 
                 if(isFirstTime) {
-                    document.getElementById("num").max = max / 2;
+                    document.getElementById("chosenWeight").max= maxWeight/ 2;
+                   // document.getElementById("chosenDegree").max= maxDegree;
                     isFirstTime = false;
                 }
-
+                document.getElementById("chosenDegree").max= maxDegree;
+                console.log(maxDegree);
+                maxDegree = 1;
             } else {
                 console.error(error);
             }
