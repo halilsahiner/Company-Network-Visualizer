@@ -23,16 +23,7 @@
 
 <div class="row"  align='center' style="bottom: 135px; margin-left: 370px; position: absolute;  ">
 
-<div class="dropdown">
-    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
-    Şirket/Proje İçin Seç
-    </button>
-    <div class="dropdown-menu">
-      <a class="dropdown-item" data-target="#form-check, #form-check2, #form-check3, #form-check4, #searchfield, #graphFilter" data-toggle="collapse" > Şirket için seç </a>
-      <a class="dropdown-item" data-target="#form-check, #form-check2, #form-check3, #form-check4, #searchfield, #graphFilter" data-toggle="collapse" > Proje için seç </a>
-    </div>
-</div>
-<div id="form-check" class="collapse" style="margin-left: 10px">
+<div id="form-check" style="margin-left: 10px">
     <label>        
         <input type="checkbox" name="check" class="weight-filter" > 
         <span >
@@ -46,12 +37,12 @@
     </label>
                 
 </div>
-<div id="form-check2" class="collapse" style="margin-left: 10px">
+<div id="form-check2" style="margin-left: 10px;">
     <label>        
         <input type="checkbox" name="check" class="projectno-filter" > 
         <span >
         Şirketin proje sayısı
-        <div id="FilterButtons" >
+        <div id="FilterButtons"  >
             <input type="number" min="0" max="1" id="num"/>
             
         </div>
@@ -61,13 +52,13 @@
                 
 </div>
 
-<div id="form-check3" class="collapse" style="margin-left: 10px">
+<div id="form-check3" style="margin-left: 10px">
     <label>        
         <input type="checkbox" name="check" class="cost-filter" > 
         <span >
-        Total cost için seç
+        Project Total Cost
         <div id="FilterButtons" >
-            <input type="number" min="0" max="1" id="num"/>
+            <input type="number" min="0" max="1" id="chosenPrjCost"/>
            
         </div>
         
@@ -76,13 +67,13 @@
                 
 </div>
 
-<div id="form-check4" class="collapse" style="margin-left: 10px; ">
+<div id="form-check4" style="margin-left: 10px; ">
     <label>        
         <input type="checkbox" name="check" class="call-filter" > 
         <span >
-        Call kod için seç
+        Call for proposal:
         <div id="FilterButtons" >
-            <input type="number" min="0" max="1" id="num"/>
+            <input type="text" id="projectCall"/>
             
         </div>
         
@@ -93,16 +84,17 @@
 
 </div>
 
-<button onclick="filteringGraph()" id= "graphFilter" class="btn btn-primary btn-success, collapse" style="margin-left:10px" ><span class="glyphicon glyphicon-filter"></span></button>
+<button onclick="filteringGraph()" id= "graphFilter" class="btn btn-primary btn-success" style="margin-left: 10px" ><span class="glyphicon glyphicon-filter"></span></button>
 
 
 </div>
     <div id="searchfield" class="collapse" >
         <form>
-            <input  type="text" name="currency" class="biginput" id="autocomplete" value="">
-
+            <input  type="text" name="currency" class="biginput" id="autocomplete" value="" placeholder="COMPANIES" style="width: 400px">
+            <input  type="text" name="currency" class="biginput" id="autocomplete2" value="" placeholder="PROJECTS" style="width: 400px">
         </form>
     </div><!-- @end #searchfield -->
+
 </div><!-- @end #content -->
 
 <div  class="left" align="left" style="vertical-align: top; float: left; margin-top: 30px; width: 350px; margin-left: 10px">
@@ -136,6 +128,9 @@
                 <td id ="connections">  # CONNECTIONS </td>
             </tr>
         </table>
+
+ 
+
 </div>
 
 
@@ -154,6 +149,8 @@
 <link rel="stylesheet" type="text/css" media="all" href="css/style.css">
 <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="js/jquery.autocomplete.min.js"></script>
+
+
 
 <script>
     var max = document.getElementById("num").max * 2;
