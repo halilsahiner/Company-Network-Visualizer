@@ -1,3 +1,72 @@
+
+// common variables
+
+var filterDegree = 0;
+var filterWeight = 0;
+var filterNumOfPrj = 0;
+var filteredNodes = [];
+var maxWeight = 0;
+var maxDegree = 0;
+var maxNumOfPrj = 0;
+var isFirstTime = true;
+var nodesToFilter;
+var projectArray = [];
+
+/**
+ * A function to draw the graph
+ */
+function drawGraph() {
+    var svg = d3.select('#d3_selectable_force_directed_graph');
+    var checkboxValues = [document.querySelector('.weight-filter').checked, document.querySelector('.projectno-filter').checked,
+        document.querySelector('.numOfPrj-filter').checked, document.querySelector('.cost-filter').checked,];
+    d3.json('json/biggest_db_with_project_text.json', function (error, graph) {
+        if (!error) {
+            if(isFirstTime){
+                graph.links = graph.links.filter(function (a) {
+                    if (maxWeight < a.weight)
+                        maxWeight = a.weight;
+                    return true;
+                });
+                graph.nodes = graph.nodes.filter(function (a) {
+                    if (maxDegree < a.baglanti)
+                        maxDegree = a.baglanti;
+                    if (maxNumOfPrj < a.kackez)
+                        maxNumOfPrj = a.kackez;
+                    return true;
+                });
+                document.getElementById("chosenWeight").max= maxWeight/ 2;
+                document.getElementById("chosenDegree").max= maxDegree;
+                document.getElementById("chosenNumOfPrj").max= maxNumOfPrj;
+                isFirstTime = false;
+            }
+            else {
+                nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {
+                });
+                if (checkboxValues[0])
+                    graph = filterByWeight(graph);
+                if (checkboxValues[1])
+                    graph = filterByDegree(graph);
+                if (checkboxValues[2])
+                    graph = filterByNumOfPrj(graph);
+                if (projectArray.length)
+                    graph = filterByProject(projectArray, graph);
+
+                createV4SelectableForceDirectedGraph(svg, graph);
+            }
+        }
+
+        else {
+            console.error(error);
+        }
+    });
+}
+
+/**
+ * The function that draws the graph and creates the simulation and its functionality
+ * @param svg
+ * @param graph
+ * @returns {{links}|Object}
+ */
 function createV4SelectableForceDirectedGraph(svg, graph) {
     // if both d3v3 and d3v4 are loaded, we'll assume
     // that d3v4 is called d3v4, otherwise we'll assume
@@ -199,69 +268,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                 	return opacity;
 
             });
-/*
-            var node1 = document.createElement("LI");
 
-
-
-            // show the partner list of the clicked node
-            graph.links.forEach(function(o){
-                if(o.source == d) {
-                    node1 = document.createElement("LI");
-                    node1.className = "list-group-item d-flex justify-content-between align-items-center";
-                    var span = document.createElement("span");
-                    span.className = "badge badge-pill badge-info";
-                    span.style= "font-size: 10px;";
-                    var textnode1 = document.createTextNode(o.target.value);
-                    var textnode2 = document.createTextNode(o.weight/2);
-                    span.appendChild(textnode2);
-                    
-                    var p = document.createElement("p");
-                    p.style = " margin-bottom: 0px; padding-right: 50px";
-                    p.appendChild(textnode1);
-                    node1.appendChild(p);
-                    
-
-                    createButton(node1, o.target.value, function(){
-                        console.log("button" + this);
-                        searchNode(o.target.value);
-                    });
-                    node1.appendChild(span);
-                    
-                    document.getElementById("myList").appendChild(node1);
-
-
-                }
-                else if(o.target == d){
-                    node1 = document.createElement("LI");
-                    node1.className = "list-group-item d-flex justify-content-between align-items-center";
-                    var span = document.createElement("span");
-                    span.className = "badge badge-pill badge-info";
-                    span.style= "font-size: 10px;";
-                    var textnode1 = document.createTextNode(o.source.value);
-                    var textnode2 = document.createTextNode(o.weight/2);
-                    span.appendChild(textnode2);
-                    
-
-                    var p = document.createElement("p");
-                    p.style = " margin-bottom: 0px; padding-right: 50px";
-                    p.appendChild(textnode1);
-                    node1.appendChild(p);
-                    
-
-                    createButton(node1, o.source.value, function(){
-                        console.log("button" + this);
-                        searchNode(o.source.value);
-                    });
-                    node1.appendChild(span);
-                    
-                    document.getElementById("myList").appendChild(node1);
-
-                }
-                else{
-                }
-            });
-*/
 
             ////sorting the list according to number of the list element.
             //// **begin with biggest**
@@ -540,17 +547,165 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
 
             lookup: graph.projects,
             onSelect: function (suggestion) {
-               // console.log(graph.nodes[suggestion.pro_nodes[0]].value);
-                console.log(suggestion.pro_nodes);
-                //searchNode(graph.nodes[suggestion.pro_nodes[0]].value);
-                projectFiltering(suggestion.pro_nodes);
+                drawGraph();
+                projectArray = suggestion.pro_nodes;
+                var button = document.createElement("button");
+                var span = document.createElement("span");
+                span.className = "glyphicon glyphicon-minus";
+                button.type = "button";
+
+                button.className = "btn btn-primary btn-danger";
+                button.appendChild(span);
+                button.onclick = function () {
+                    projectArray = [];
+                    drawGraph();
+                    document.getElementById("cancelPrjName").removeChild(button);
+                };
+                document.getElementById("cancelPrjName").appendChild(button);
             }
 
+        });
+        $('#autocompleteCall').autocomplete({
+            lookup: graph.pro_codes,
+            onSelect: function (suggestion) {
+                drawGraph();
+                projectArray = suggestion.co_nodes;
+                var button = document.createElement("button");
+                var span = document.createElement("span");
+                span.className = "glyphicon glyphicon-minus";
+                button.type = "button";
+                button.className = "btn btn-primary btn-danger";
+                button.appendChild(span);
+                button.onclick = function () {
+                    projectArray = [];
+                    drawGraph();
+                    document.getElementById("cancelCallCode").removeChild(button);
+                };
+                document.getElementById("cancelCallCode").appendChild(button);
+            }
         });
 
 
 
     });
+    return graph;
+}
 
+/**
+ * A function to filter the graph object's links and nodes by the link weight between nodes
+ * @param graph The graph object to filter in the function
+ * @returns filtered graph object by weight
+ */
+function filterByWeight(graph){
+    filterWeight = document.getElementById("chosenWeight").value * 2;
+
+    if(filterWeight) {
+        filteredNodes = [];
+
+        graph.links = graph.links.filter(function (a) {
+
+            if (a.weight >= filterWeight) {
+                nodesToFilter[a.source - 1] = 1;
+                nodesToFilter[a.target - 1] = 1;
+                return true;
+            }
+            return false;
+        });
+
+        for (var k = 0; k < nodesToFilter.length; k++) {
+            if (nodesToFilter[k] === 1) {
+                filteredNodes.push(graph.nodes.find(function (r) {
+                    if (maxDegree < r.baglanti)
+                        maxDegree = r.baglanti;
+                    return r.data === k+1;
+                }));
+
+            }
+        }
+        graph.nodes = filteredNodes;
+        document.getElementById("chosenDegree").max= maxDegree;
+        maxDegree = 1;
+
+
+    }
+    return graph;
+}
+
+/**
+ * A function to filter the graph object's links and nodes by the degree of the nodes
+ * @param graph The graph object to filter in the function
+ * @returns filtered graph object by degree of nodes
+ */
+function filterByDegree(graph){
+    filterDegree = document.getElementById("chosenDegree").value;
+    if(filterDegree) {
+
+        graph.nodes = graph.nodes.filter(function (a) {
+            return a.baglanti >= filterDegree;
+        });
+        graph.links = graph.links.filter(function (a) {
+            if (graph.nodes.findIndex(function (r){
+                return a.source === r.data;
+            }) === -1)
+                return false;
+            else if (graph.nodes.findIndex(function (r){
+                return a.target === r.data;
+            }) === -1)
+                return false;
+            return true;
+        });
+    }
+    return graph;
+}
+/**
+ * A function to filter the graph object's links and nodes by the number of the projects that company nodes in
+ * @param graph The graph object to filter in the function
+ * @returns filtered graph object by the number of projects that company nodes in
+ */
+function filterByNumOfPrj(graph){
+    filterNumOfPrj= document.getElementById("chosenNumOfPrj").value;
+    if(filterNumOfPrj) {
+
+        graph.nodes = graph.nodes.filter(function (a) {
+            return a.kackez >= filterNumOfPrj;
+        });
+        graph.links = graph.links.filter(function (a) {
+            if (graph.nodes.findIndex(function (r){
+                return a.source === r.data;
+            }) === -1)
+                return false;
+            else if (graph.nodes.findIndex(function (r){
+                return a.target === r.data;
+            }) === -1)
+                return false;
+            return true;
+        });
+    }
+    return graph;
+}
+/**
+ * A function to filter the graph object's links and nodes by the given projects' node array
+ * @param graph The graph object to filter in the function
+ * @returns filtered graph object by the given projects' node array
+ */
+function filterByProject(projectArray, graph){
+    graph.nodes = graph.nodes.filter(function (a) {
+        if(projectArray.findIndex(function (r) {
+            return a.data === r;
+        }) !== -1)
+            return true;
+        return false;
+    });
+    graph.links = graph.links.filter(function (a) {
+        if (graph.nodes.findIndex(function (r){
+            return a.source === r.data;
+        }) === -1)
+            return false;
+        else if (graph.nodes.findIndex(function (r){
+            return a.target === r.data;
+        }) === -1)
+            return false;
+        return true;
+    });
     return graph;
 }

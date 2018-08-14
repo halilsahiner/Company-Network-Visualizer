@@ -10,7 +10,7 @@
 
 <body>
 
-<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin-right: 250px; margin-top: 30px; margin-left: 350px; float: middle; margin-bottom: 12px; position: absolute;" >
+<div align='center' id="d3_selectable_force_directed_graph" style="width: 960px; height: 500px; margin-right: 250px; margin-top: 30px; margin-left: 350px; margin-bottom: 12px; position: absolute;" >
     <svg></svg>
 
 </div>
@@ -23,78 +23,76 @@
 
 <div class="row"  align='center' style="bottom: 135px; margin-left: 370px; position: absolute;  ">
 
-<div id="form-check" style="margin-left: 10px">
+
+<div id="form-check" c style="margin-left: 10px">
     <label>        
-        <input type="checkbox" name="check" class="weight-filter" > 
+        <input type="checkbox" name="check" class="weight-filter" >
         <span >
-        Bağlantı sayısı
-        <div id="FilterButtons" >
-            <input type="number" min="0" max="1" id="num"/>
+        Number of projects between companies
+        <input type="number" min="0" max="1" id="chosenWeight"/>
             
-        </div>
+
         
         </span>
     </label>
                 
 </div>
-<div id="form-check2" style="margin-left: 10px;">
+<div id="form-check2" style="margin-left: 10px">
     <label>        
-        <input type="checkbox" name="check" class="projectno-filter" > 
+        <input type="checkbox" name="check" class="projectno-filter" >
         <span >
-        Şirketin proje sayısı
-        <div id="FilterButtons"  >
-            <input type="number" min="0" max="1" id="num"/>
-            
-        </div>
-        
+        Number of connections
+        <input type="number" min="0" max="1" id="chosenDegree"/>
+
         </span>
     </label>
                 
 </div>
+    <div id="form-check3" style="margin-left: 10px">
+        <label>
+            <input type="checkbox" name="check" class="numOfPrj-filter" >
+            <span >
+            Number of projects
 
-<div id="form-check3" style="margin-left: 10px">
-    <label>        
-        <input type="checkbox" name="check" class="cost-filter" > 
-        <span >
-        Project Total Cost
-        <div id="FilterButtons" >
-            <input type="number" min="0" max="1" id="chosenPrjCost"/>
-           
-        </div>
-        
-        </span>
-    </label>
-                
-</div>
+        <input type="number" min="0" max="1" id="chosenNumOfPrj"/>
 
-<div id="form-check4" style="margin-left: 10px; ">
-    <label>        
-        <input type="checkbox" name="check" class="call-filter" > 
+
+    </span>
+        </label>
+
+
+        <div id="form-check4" style="margin-left: 10px">
+    <label>
+        <input type="checkbox" name="check" class="cost-filter" >
         <span >
-        Call for proposal:
-        <div id="FilterButtons" >
-            <input type="text" id="projectCall"/>
-            
-        </div>
-        
-        </span>
+    Project Total Cost
+
+        <input type="number" min="0" max="1" id="chosenPrjCost"/>
+    </span>
     </label>
 
+</div>
+
+
+    </div>
+
+
+
+<button onclick="drawGraph()" id= "graphFilter" class="btn btn-primary btn-success" style="margin-left:10px" ><span class="glyphicon glyphicon-filter"></span></button>
 
 
 </div>
-
-<button onclick="filteringGraph()" id= "graphFilter" class="btn btn-primary btn-success" style="margin-left: 10px" ><span class="glyphicon glyphicon-filter"></span></button>
-
-
-</div>
-    <div id="searchfield" class="collapse" >
-        <form>
-            <input  type="text" name="currency" class="biginput" id="autocomplete" value="" placeholder="COMPANIES" style="width: 400px">
-            <input  type="text" name="currency" class="biginput" id="autocomplete2" value="" placeholder="PROJECTS" style="width: 400px">
+    <div id="searchfield"  >
+        <form >
+            <input  placeholder="Search for companies" type="text" name="currency" class="biginput" id="autocompleteCompanies" value="">
+        </form>
+        <form id = "cancelPrjName">
+            <input  placeholder="Search for projects" type="text" name="currency" class="biginput" id="autocompleteProjects" value="">
+        </form>
+        <form id= "cancelCallCode">
+            <input  placeholder="Search call codes" type="text" name="currency" class="biginput" id="autocompleteCall" value="">
         </form>
     </div><!-- @end #searchfield -->
-
 </div><!-- @end #content -->
 
 <div  class="left" align="left" style="vertical-align: top; float: left; margin-top: 30px; width: 350px; margin-left: 10px">
@@ -110,27 +108,30 @@
 <div  class="right" align="right" style="vertical-align: top; float: right; margin-top: 10px; width: 200px; text-align: center; margin-top: 30px; margin-right: 10px">
     <table class="table table-dark table-striped">
             <thead>
-            <th> INFO </th>
+            <th> </th>
+            <th> Clicked Company</th>
             </thead>
             <tr>
+                <td>Name :</td>
                 <td id ="isim"> NAME </td>
             </tr>
             <tr>
+                <td>Country :</td>
                 <td id = "country"> COUNTRY </td>
             </tr>
             <tr>
+                <td>Activity :</td>
                 <td id ="type"> ACTIVITY TYPE </td>
             </tr>
             <tr>
+                <td>Number of Projects:</td>
                 <td id ="kac"> # PROJECTS </td>
             </tr>
             <tr>
+                <td>Number of Connections:</td>
                 <td id ="connections">  # CONNECTIONS </td>
             </tr>
         </table>
-
- 
-
 </div>
 
 
@@ -150,72 +151,6 @@
 <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="js/jquery.autocomplete.min.js"></script>
 
-
-
 <script>
-    var max = document.getElementById("num").max * 2;
-    var filterWeight = 4;
-    var isFirstTime = true;
-    var filteredNodes = [];
-    var nodesToFilter;
-   
-    function filteringGraph() {
-        console.log(document.querySelector('.weight-filter').checked);
-         var svg = d3.select('#d3_selectable_force_directed_graph');
-
-        if(isFirstTime !== true)
-            filterWeight = document.getElementById("num").value * 2;
-        console.log(filterWeight);
-        d3.json('json/database_biggest.json', function(error, graph) {
-            graph.nodes.sort(function (a,b) {
-               return a.data - b.data;
-            });
-            //console.log(graph.nodes);
-            if (!error) {
-
-                if(filterWeight !== 0)
-                    nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {});
-
-                graph.links = graph.links.filter(function (a) {
-                    if(isFirstTime !== false) {
-                        if (max < a.weight)
-                            max = a.weight;
-                    }
-
-                    if(filterWeight !== 0 && a.weight >= filterWeight)
-                    {
-                        nodesToFilter[a.source-1] = 1;
-                        nodesToFilter[a.target-1] = 1;
-                    }
-                    return a.weight >= filterWeight;
-
-                });
-                //console.log(nodesToFilter);
-
-                if( filterWeight !== 0) {
-                    filteredNodes = [];
-
-                    for (var k = 0; k < graph.nodes.length; k++) {
-                        if (nodesToFilter[k] === 1)
-                            filteredNodes.push(graph.nodes[k]);
-
-                    }
-                    //console.log(filteredNodes);
-
-                    graph.nodes = filteredNodes;
-                }
-
-                createV4SelectableForceDirectedGraph(svg, graph);
-
-                if(isFirstTime) {
-                    document.getElementById("num").max = max / 2;
-                    isFirstTime = false;
-                }
-
-            } else {
-                console.error(error);
-            }
-        });
-    }
-    filteringGraph();
+    drawGraph();
 </script> 
