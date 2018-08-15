@@ -4,13 +4,16 @@
 var filterDegree = 0;
 var filterWeight = 0;
 var filterNumOfPrj = 0;
+var filterCost = 0;
 var filteredNodes = [];
 var maxWeight = 0;
 var maxDegree = 0;
 var maxNumOfPrj = 0;
+var maxTotalCost = 0;
 var isFirstTime = true;
 var nodesToFilter;
 var projectArray = [];
+
 
 /**
  * A function to draw the graph
@@ -19,35 +22,42 @@ function drawGraph() {
     var svg = d3.select('#d3_selectable_force_directed_graph');
     var checkboxValues = [document.querySelector('.weight-filter').checked, document.querySelector('.projectno-filter').checked,
         document.querySelector('.numOfPrj-filter').checked, document.querySelector('.cost-filter').checked,];
-    d3.json('json/biggest_db_with_project_text.json', function (error, graph) {
+    d3.json('json/database_test.json', function (error, graph) {
         if (!error) {
             if(isFirstTime){
-                graph.links = graph.links.filter(function (a) {
+                graph.links.forEach(function (a) {
                     if (maxWeight < a.weight)
                         maxWeight = a.weight;
-                    return true;
                 });
-                graph.nodes = graph.nodes.filter(function (a) {
+                graph.nodes.forEach(function (a) {
                     if (maxDegree < a.baglanti)
                         maxDegree = a.baglanti;
                     if (maxNumOfPrj < a.kackez)
                         maxNumOfPrj = a.kackez;
-                    return true;
+
+                });
+                graph.projects.forEach(function (element) {
+                    if (maxTotalCost < element.totalcost)
+                        maxTotalCost = element.totalcost;
                 });
                 document.getElementById("chosenWeight").max= maxWeight/ 2;
                 document.getElementById("chosenDegree").max= maxDegree;
                 document.getElementById("chosenNumOfPrj").max= maxNumOfPrj;
+                document.getElementById("chosenPrjCost").max = maxTotalCost;
                 isFirstTime = false;
             }
             else {
                 nodesToFilter = Array.apply(null, Array(graph.nodes.length)).map(function () {
                 });
+
                 if (checkboxValues[0])
                     graph = filterByWeight(graph);
                 if (checkboxValues[1])
                     graph = filterByDegree(graph);
                 if (checkboxValues[2])
                     graph = filterByNumOfPrj(graph);
+                if (checkboxValues[3])
+                    graph = filterByTotalCost(graph);
                 if (projectArray.length)
                     graph = filterByProject(projectArray, graph);
 
@@ -184,13 +194,28 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
         linkedByIndex[d.source + "," + d.target] = 1;
     });
 
+    /**
+     * A function to check the two nodes are connected or not by looking up the linkedByIndex array
+     * @param a node object to check connection
+     * @param b node object to check connection
+     * @returns true, if the given nodes are connected by a link or they are same; false if not
+     */
     function isConnected(a, b) {
         return linkedByIndex[a.data + "," + b.data] || linkedByIndex[b.data + "," + a.data] || a.data == b.data;
     }
 
+    /**
+     * A function to simulate a fade effect to the non-neighbour nodes of clicked object and create a list
+     * of neighbours to the focused node.
+     * @param opacity a value to specify the fade rate [0,1]
+     * @returns {Function} a function object that can be used as event for node.on actions
+     */
     function fade(opacity) {
         return function(d) {
+
+            // empty the list to fill with the clicked nodes neighbours
             $("ul").empty();
+
             node.style("stroke-opacity", function(o) {
 
                 let thisOpacity = isConnected(d, o) ? 1 : opacity;
@@ -200,10 +225,10 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                 return thisOpacity;
             });
 
-            document.getElementById("isim").innerHTML = d.value;
+            document.getElementById("name").innerHTML = d.value;
             document.getElementById("country").innerHTML = d.country;
             document.getElementById("type").innerHTML = d.activity;
-            document.getElementById("kac").innerHTML = d.kackez;
+            document.getElementById("num-of-prj").innerHTML = d.kackez;
             document.getElementById("connections").innerHTML = d.baglanti;
             
             //show the partner list of the clicked node and adjust link opacity clicking node
@@ -217,7 +242,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     var span = document.createElement("span");
                     span.className = "badge badge-pill badge-info";
                     span.style= "font-size: 10px;";
-                    span.title ="Project number between 2 companies";
+                    span.title ="Number of project between the companies";
                     var textnode1 = document.createTextNode(o.target.value);
                     var textnode2 = document.createTextNode(o.weight/2);
                     span.appendChild(textnode2);
@@ -228,9 +253,9 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     node1.appendChild(p);
                     
 
-                    createButton(node1, o.target.value, function(){
+                    createGoButton(node1, function(){
                         console.log("button" + this);
-                        searchNode(o.target.value);
+                        searchAndClick(o.target.value);
                     });
                     node1.appendChild(span);
                     
@@ -244,7 +269,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     var span = document.createElement("span");
                     span.className = "badge badge-pill badge-info";
                     span.style= "font-size: 10px;";
-                    span.title ="Project number between 2 companies";
+                    span.title ="Number of projects between the companies";
                     var textnode1 = document.createTextNode(o.source.value);
                     var textnode2 = document.createTextNode(o.weight/2);
                     span.appendChild(textnode2);
@@ -256,10 +281,9 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     node1.appendChild(p);
                     
 
-                    createButton(node1, o.source.value, function(){
+                    createGoButton(node1, function(){
                         console.log("button" + this);
-                        searchNode(o.source.value);
-                        
+                        searchAndClick(o.source.value);
                     });
                     node1.appendChild(span);
                     
@@ -303,23 +327,32 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
 
         };
     }
-    function createButton(context,value, func){
+
+    /**
+     * A function to create a "GO!" button under specified html tag
+     * @param context the tag that will have that button under itsel
+     * @param func the function that will be evoked when button onclick
+     */
+    function createGoButton(context, func){
         var button = document.createElement("button");
         var span = document.createElement("span");
         span.className = "";
-        span.innerHTML = "Go!";
-        span.style ="font-size: 10px";
         button.type = "button";
+        span.innerHTML = "Go!";
+        span.style = "font-size: 10px";
+        button.title = "Click to go this company";
         button.className = "btn btn-xs btn-info";
         button.style = "margin-right: 10px; margin-left:auto; padding-right: auto";
         button.appendChild(span);
         button.onclick = func;
         context.appendChild(button);
-        button.title = "Click to go this company";
     }
 
-
-    function searchNode(name){
+    /**
+     * A function to search the node on graph and click it for autocomplete functionality
+     * @param name the name of the node to search
+     */
+    function searchAndClick(name){
 
         if( name !== null) {
             graph.nodes.forEach(function (d) {
@@ -338,7 +371,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
         }
     }
 
-
+    // bonds the interactions of mouse events with nodes
     node.on("click", fade(.1)).on("unclick", fade(1));
 
 
@@ -539,7 +572,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             lookup: graph.nodes,
             onSelect: function (suggestion) {
 
-                searchNode(suggestion.value);
+                searchAndClick(suggestion.value);
             }
 
         }).keypress(function (e) {
@@ -555,39 +588,58 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             onSelect: function (suggestion) {
                 drawGraph();
                 projectArray = suggestion.pro_nodes;
-                var button = document.createElement("button");
-                var span = document.createElement("span");
-                span.className = "glyphicon glyphicon-minus";
-                button.type = "button";
-
-                button.className = "btn btn-primary btn-danger";
-                button.appendChild(span);
-                button.onclick = function () {
-                    projectArray = [];
-                    drawGraph();
-                    document.getElementById("cancelPrjName").removeChild(button);
-                };
-                document.getElementById("cancelPrjName").appendChild(button);
+                if(document.getElementById("cancelPrjName").children.length === 1) {
+                    var button = document.createElement("button");
+                    var span = document.createElement("span");
+                    span.className = "";
+                    span.innerHTML = "X";
+                    span.style ="font-size: 10px";
+                    button.type = "button";
+                    button.style = "margin-right: 10px; margin-left:auto; padding-right: auto";
+                    button.className = "btn btn-primary btn-danger";
+                    button.appendChild(span);
+                    button.onclick = function () {
+                        projectArray = [];
+                        drawGraph();
+                        document.getElementById("cancelPrjName").removeChild(button);
+                    };
+                    document.getElementById("cancelPrjName").appendChild(button);
+                }
             }
 
+        }).keypress(function (e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                //do something
+            }
         });
         $('#autocompleteCall').autocomplete({
             lookup: graph.pro_codes,
             onSelect: function (suggestion) {
                 drawGraph();
                 projectArray = suggestion.co_nodes;
-                var button = document.createElement("button");
-                var span = document.createElement("span");
-                span.className = "glyphicon glyphicon-minus";
-                button.type = "button";
-                button.className = "btn btn-primary btn-danger";
-                button.appendChild(span);
-                button.onclick = function () {
-                    projectArray = [];
-                    drawGraph();
-                    document.getElementById("cancelCallCode").removeChild(button);
-                };
-                document.getElementById("cancelCallCode").appendChild(button);
+                if(document.getElementById("cancelCallCode").children.length === 1) {
+                    var button = document.createElement("button");
+                    var span = document.createElement("span");
+                    span.className = "";
+                    span.innerHTML = "X";
+                    span.style ="font-size: 10px";
+                    button.type = "button";
+                    button.style = "margin-right: 10px; margin-left:auto; padding-right: auto"
+                    button.className = "btn btn-primary btn-danger";
+                    button.appendChild(span);
+                    button.onclick = function () {
+                        projectArray = [];
+                        drawGraph();
+                        document.getElementById("cancelCallCode").removeChild(button);
+                    };
+                    document.getElementById("cancelCallCode").appendChild(button);
+                }
+            }
+        }).keypress(function (e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                //do something
             }
         });
 
@@ -713,5 +765,16 @@ function filterByProject(projectArray, graph){
             return false;
         return true;
     });
+    return graph;
+}
+
+function filterByTotalCost(graph){
+    filterCost = document.getElementById("chosenPrjCost").value;
+
+    if(filterCost) {
+        graph.projects = graph.projects.filter(function (a) {
+            return a.totalcost >= filterCost;
+        });
+    }
     return graph;
 }

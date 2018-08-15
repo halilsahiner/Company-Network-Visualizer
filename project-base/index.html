@@ -10,11 +10,11 @@
 
 <body>
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark" style="height: 50px" >
-  <!-- Brand/logo -->
-  <a class="navbar-brand" href="#">
-    <img src="teknopar.png" alt="logo" style="width:400px;">
-  </a>
- 
+    <!-- Brand/logo -->
+    <a class="navbar-brand" href="#">
+        <img src="teknopar.png" alt="logo" style="width:400px;">
+    </a>
+
 </nav>
 
 <div align='center' id="d3_selectable_force_directed_graph" style="width: 930px; height: 500px; margin-right: 280px; margin-top: 10px; margin-left: 350px; margin-bottom: 12px; position: absolute; display: block; text-align: center; " >
@@ -25,89 +25,89 @@
 
 <div id="content" style="bottom: 0px; position: absolute; text-align: center; padding-bottom: 15px">
 
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#myModal" style="">
-    Filter Options
-  </button>
-<div class="row"  align='center' style="  ">
+    <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#myModal" style="">
+        Filter Options
+    </button>
+    <div class="row"  align='center' style="  ">
 
-  <!-- The Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-      
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Choose Filter Options</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        
-        <!-- Modal body -->
-        <div class="modal-body">
-        <div class="grid-container"  align='center' style="display: grid; grid-column-gap: 10px; grid-template-columns: 140px 140px 140px 140px; padding: auto; width: 600px; margin: 0 auto;">
+        <!-- The Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
 
-<div id="form-check" class="grid-item" style="">
-    <label>        
-        <input type="checkbox" name="check" class="weight-filter" >
-        <span >
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Choose Filter Options</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="grid-container"  align='center' style="display: grid; grid-column-gap: 10px; grid-template-columns: 140px 140px 140px 140px; padding: auto; width: 600px; margin: 0 auto;">
+
+                            <div id="form-check" class="grid-item" style="">
+                                <label>
+                                    <input type="checkbox" name="check" class="weight-filter" >
+                                    <span >
         Number of colloborations
         <input type="number" min="0" max="1" id="chosenWeight"/ style="width: 100px">
-        
+
         </span>
-    </label>
-                
-</div>
-<div id="form-check2" class="grid-item" style="">
-    <label>        
-        <input type="checkbox" name="check" class="projectno-filter" >
-        <span >
+                                </label>
+
+                            </div>
+                            <div id="form-check2" class="grid-item" style="">
+                                <label>
+                                    <input type="checkbox" name="check" class="projectno-filter" >
+                                    <span >
         Number of connections
         <input type="number" min="0" max="1" id="chosenDegree"/ style="width: 100px">
 
         </span>
-    </label>
-                
-</div>
-    <div id="form-check3" class="grid-item" style="">
-        <label style="margin-bottom: 0px">
-            <input type="checkbox" name="check" class="numOfPrj-filter" >
-            <span >
-            Number of projects         
+                                </label>
+
+                            </div>
+                            <div id="form-check3" class="grid-item" style="">
+                                <label style="margin-bottom: 0px">
+                                    <input type="checkbox" name="check" class="numOfPrj-filter" >
+                                    <span >
+            Number of projects
 
         <input type="number" min="0" max="1" id="chosenNumOfPrj"/ style="width: 100px">
 
 
     </span>
-        </label>
-</div>
+                                </label>
+                            </div>
 
-        <div id="form-check4" class="grid-item" style="">
-    <label>
-        <input type="checkbox" name="check" class="cost-filter" >
-        <span >
-        Project Total Cost               
+                            <div id="form-check4" class="grid-item" style="">
+                                <label>
+                                    <input type="checkbox" name="check" class="cost-filter" >
+                                    <span >
+        Project Total Cost
 
         <input type="number" min="0" max="1" id="chosenPrjCost"/ style="width: 110px">
     </span>
-    </label>
+                                </label>
 
-</div>
+                            </div>
 
 
-    
 
-</div>
+
+                        </div>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button onclick="drawGraph()" id= "graphFilter" class="btn btn-primary btn-dark" data-dismiss="modal" style="margin-left:10px" ><span class="glyphicon glyphicon-filter">GO!</span></button>
+                    </div>
+
+                </div>
+            </div>
         </div>
-        
-        <!-- Modal footer -->
-        <div class="modal-footer">
-          <button onclick="drawGraph()" id= "graphFilter" class="btn btn-primary btn-dark" data-dismiss="modal" style="margin-left:10px" ><span class="glyphicon glyphicon-filter">GO!</span></button>
-        </div>
-        
-      </div>
+
     </div>
-  </div>
-
-</div>
 
 
     <div id="searchfield"  >
@@ -125,7 +125,7 @@
 </div><!-- @end #content -->
 
 <div  class="left" align="left" style="vertical-align: top; float: left; margin-top: 10px; width: 350px; margin-left: 10px; margin-right: auto">
-    
+
     <h4 style="text-align: center">PARTNERS</h4>
     <ul id="myList" style="margin-right: 50px; width: 350px; overflow: scroll; -webkit-overflow-scrolling: touch; max-height: 470px; padding-left: 0px ">
 
@@ -136,31 +136,31 @@
 
 <div  class="right" align="right" style="vertical-align: top; float: right; margin-top: 10px; width: 230px; text-align: center; margin-right: 20px; font-size: 13px">
     <table class="table table-dark table-striped">
-            <thead>
-            <th> </th>
-            <th> Clicked Company</th>
-            </thead>
-            <tr>
-                <td>Name :</td>
-                <td id ="isim"> NAME </td>
-            </tr>
-            <tr>
-                <td>Country :</td>
-                <td id = "country"> COUNTRY </td>
-            </tr>
-            <tr>
-                <td>Activity :</td>
-                <td id ="type"> ACTIVITY TYPE </td>
-            </tr>
-            <tr>
-                <td>Number of Projects:</td>
-                <td id ="kac"> # PROJECTS </td>
-            </tr>
-            <tr>
-                <td>Number of Connections:</td>
-                <td id ="connections">  # CONNECTIONS </td>
-            </tr>
-        </table>
+        <thead>
+        <th> </th>
+        <th> Clicked Company</th>
+        </thead>
+        <tr>
+            <td>Name :</td>
+            <td id ="name"> NAME </td>
+        </tr>
+        <tr>
+            <td>Country :</td>
+            <td id = "country"> COUNTRY </td>
+        </tr>
+        <tr>
+            <td>Activity :</td>
+            <td id ="type"> ACTIVITY TYPE </td>
+        </tr>
+        <tr>
+            <td>Number of Projects:</td>
+            <td id ="num-of-prj"> # PROJECTS </td>
+        </tr>
+        <tr>
+            <td>Number of Connections:</td>
+            <td id ="connections">  # CONNECTIONS </td>
+        </tr>
+    </table>
 </div>
 
 
@@ -184,4 +184,4 @@
 
 <script>
     drawGraph();
-</script> 
+</script>
