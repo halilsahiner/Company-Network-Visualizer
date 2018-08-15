@@ -4,6 +4,11 @@
 
 This is a project that visualizes the corparate newtrok with forced directed graph by using d3 library
 
+## Installation
+
+### Database
+For database, look at that link https://github.com/emrebilici/cordis-databasegraph-python
+
 ## Tutorial
 
 1. First, filter options that pops up at the beginning should be filled for intended graph to be drawed.
