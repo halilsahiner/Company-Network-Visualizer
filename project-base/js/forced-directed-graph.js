@@ -134,7 +134,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
         .enter().append("line")
         .attr("stroke", function(d) {
         	if (d.weight == 2 )
-        		return " grey";
+        		return "grey";
         	if (d.weight == 4)
         		return "yellow";
         	if (d.weight == 6 )
@@ -222,7 +222,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     span.appendChild(textnode2);
                     
                     var p = document.createElement("p");
-                    p.style = "margin-bottom: 0px; padding-right: 50px";
+                    p.style = "margin-bottom: 0px; padding-right: auto; font-size: 15px";
                     p.appendChild(textnode1);
                     node1.appendChild(p);
                     
@@ -249,7 +249,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     
 
                     var p = document.createElement("p");
-                    p.style = " margin-bottom: 0px; padding-right: 50px";
+                    p.style = " margin-bottom: 0px; padding-right: auto; font-size: 15px";
                     p.appendChild(textnode1);
                     node1.appendChild(p);
                     
@@ -257,6 +257,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     createButton(node1, o.source.value, function(){
                         console.log("button" + this);
                         searchNode(o.source.value);
+                        
                     });
                     node1.appendChild(span);
                     
@@ -303,10 +304,12 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
     function createButton(context,value, func){
         var button = document.createElement("button");
         var span = document.createElement("span");
-        span.className = "glyphicon glyphicon-arrow-right";
+        span.className = "";
+        span.innerHTML = "Go!";
+        span.style ="font-size: 10px";
         button.type = "button";
         button.className = "btn btn-xs btn-info";
-        button.style = "margin-right: 0px; margin-left:auto";
+        button.style = "margin-right: 10px; margin-left:auto; padding-right: auto";
         button.appendChild(span);
         button.onclick = func;
         context.appendChild(button);
