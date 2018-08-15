@@ -217,6 +217,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     var span = document.createElement("span");
                     span.className = "badge badge-pill badge-info";
                     span.style= "font-size: 10px;";
+                    span.title ="Project number between 2 companies";
                     var textnode1 = document.createTextNode(o.target.value);
                     var textnode2 = document.createTextNode(o.weight/2);
                     span.appendChild(textnode2);
@@ -243,6 +244,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
                     var span = document.createElement("span");
                     span.className = "badge badge-pill badge-info";
                     span.style= "font-size: 10px;";
+                    span.title ="Project number between 2 companies";
                     var textnode1 = document.createTextNode(o.source.value);
                     var textnode2 = document.createTextNode(o.weight/2);
                     span.appendChild(textnode2);
@@ -313,6 +315,7 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
         button.appendChild(span);
         button.onclick = func;
         context.appendChild(button);
+        button.title = "Click to go this company";
     }
 
 
