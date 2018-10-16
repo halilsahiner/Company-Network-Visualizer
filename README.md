@@ -1,4 +1,4 @@
-# Corporate-Network-Visualizer
+# Company-Network-Visualizer
 
 ## About
 
